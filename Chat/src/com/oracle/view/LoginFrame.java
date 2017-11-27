@@ -15,8 +15,10 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import javafx.scene.text.Font;
+
 public class LoginFrame extends JFrame {
-	private JLabel headImage;
+	private JLabel headImage,loginname,registername;
 	private JButton login, register;
 	private JComboBox username;
 	private JPasswordField passwordInput;
@@ -38,21 +40,24 @@ public class LoginFrame extends JFrame {
 	}
 
 	public void initComponent() {// 初始化窗口组件的方法
-		headImage = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().createImage("resourses/images/3.jpg")));
-		// headImage.setBackground(Color.blue);//设置边框颜色
-		// headImage.setBorder(BorderFactory.createLineBorder(Color.red));//组件边框颜色
-		headImage.setSize(500, 200);
-		headImage.setLocation(0, 0);
-		this.add(headImage);
-
+		loginname=new JLabel("账号:");
+		loginname.setSize(50, 30);
+		loginname.setLocation(80, 150);
+		this.add(loginname);
+		
+		loginname=new JLabel("密码：");
+		loginname.setSize(50, 30);
+		loginname.setLocation(80, 200);
+		this.add(loginname);
+		
 		username = new JComboBox(new Object[]{"111","222","333"});
 		username.setSize(230, 30);
-		username.setLocation(130, 220);
+		username.setLocation(130, 150);
 		this.add(username);
 
 		passwordInput = new JPasswordField("111");
 		passwordInput.setSize(230, 30);
-		passwordInput.setLocation(130, 260);
+		passwordInput.setLocation(130, 200);
 		this.add(passwordInput);
 
 		login = new JButton("登录");
@@ -66,13 +71,20 @@ public class LoginFrame extends JFrame {
 			}
 		});
 		login.setSize(110, 40);
-		login.setLocation(130, 315);
+		login.setLocation(130, 260);
 		this.add(login);
 
 		register = new JButton("注册");
 		register.setSize(110, 40);
-		register.setLocation(250, 315);
+		register.setLocation(250, 260);
 		this.add(register);
+		
+		headImage = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().createImage("resourses/images/3.jpg")));
+		// headImage.setBackground(Color.blue);//设置边框颜色
+		// headImage.setBorder(BorderFactory.createLineBorder(Color.red));//组件边框颜色
+		headImage.setSize(500, 400);
+		headImage.setLocation(0, 0);
+		this.add(headImage);
 	}
 	
 	
