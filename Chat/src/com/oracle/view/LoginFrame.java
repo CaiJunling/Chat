@@ -15,8 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import javafx.scene.text.Font;
-
 public class LoginFrame extends JFrame {
 	private JLabel headImage,loginname,registername;
 	private JButton login, register;
