@@ -44,9 +44,11 @@ public class ChatFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public ChatFrame() {
+		setTitle("和小薛薛热聊中");
 		setIconImage(Toolkit.getDefaultToolkit().createImage("resourses/images/头像1.jpg"));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 538, 400);
+		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -81,5 +83,9 @@ public class ChatFrame extends JFrame {
 		JLabel lblNewLabel = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().createImage("resourses/images/头像2.jpg")));
 		lblNewLabel.setBounds(387, 0, 135, 209);
 		contentPane.add(lblNewLabel);
+		
+		JLabel lblNewLabel_1 = new JLabel("我的头像");
+		lblNewLabel_1.setBounds(387, 209, 125, 151);
+		contentPane.add(lblNewLabel_1);
 	}
 }

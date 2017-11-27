@@ -14,9 +14,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import java.awt.Font;
 
 public class LoginFrame extends JFrame {
 	private JLabel headImage,loginname,registername;
+	private JLabel loginname_1;
 	private JButton login, register;
 	private JComboBox username;
 	private JPasswordField passwordInput;
@@ -27,10 +29,10 @@ public class LoginFrame extends JFrame {
 		setLocationRelativeTo(null);// 设置相对位置
 		setVisible(true);// 窗口显示
 		setResizable(false);// 窗口不可改大小
-		setTitle("芒果聊天");
-		setLayout(null);// 不采用任何默认布局
+		setTitle("熊猫聊天");
+		getContentPane().setLayout(null);// 不采用任何默认布局
 		setDefaultCloseOperation(EXIT_ON_CLOSE);// 关掉xx的时候程序也关掉了
-		setIconImage(Toolkit.getDefaultToolkit().createImage("resourses/images/66.jpg"));
+		setIconImage(Toolkit.getDefaultToolkit().createImage("resourses/images/头像1.jpg"));
 		initComponent();
 		paintComponents(getGraphics());// 避免组件不是一次性出来
 		paintAll(getGraphics());// 避免组件不是一次性出来
@@ -39,26 +41,29 @@ public class LoginFrame extends JFrame {
 
 	public void initComponent() {// 初始化窗口组件的方法
 		loginname=new JLabel("账号:");
-		loginname.setSize(50, 30);
-		loginname.setLocation(80, 150);
-		this.add(loginname);
+		loginname.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+		loginname.setSize(73, 30);
+		loginname.setLocation(57, 150);
+		getContentPane().add(loginname);
 		
-		loginname=new JLabel("密码：");
-		loginname.setSize(50, 30);
-		loginname.setLocation(80, 200);
-		this.add(loginname);
+		loginname_1=new JLabel("密码：");
+		loginname_1.setFont(new Font("微软雅黑", Font.PLAIN, 14));
+		loginname_1.setSize(73, 30);
+		loginname_1.setLocation(57, 200);
+		getContentPane().add(loginname_1);
 		
 		username = new JComboBox(new Object[]{"111","222","333"});
 		username.setSize(230, 30);
 		username.setLocation(130, 150);
-		this.add(username);
+		getContentPane().add(username);
 
 		passwordInput = new JPasswordField("111");
 		passwordInput.setSize(230, 30);
 		passwordInput.setLocation(130, 200);
-		this.add(passwordInput);
+		getContentPane().add(passwordInput);
 
 		login = new JButton("登录");
+		login.setFont(new Font("宋体", Font.BOLD, 15));
 		// login.setBorder(BorderFactory.createLineBorder(Color.red));
 	//	login.addMouseListener(new MyMouseListener(this));
 		login.addActionListener(new ActionListener() {
@@ -70,19 +75,20 @@ public class LoginFrame extends JFrame {
 		});
 		login.setSize(110, 40);
 		login.setLocation(130, 260);
-		this.add(login);
+		getContentPane().add(login);
 
 		register = new JButton("注册");
+		register.setFont(new Font("宋体", Font.BOLD, 15));
 		register.setSize(110, 40);
 		register.setLocation(250, 260);
-		this.add(register);
+		getContentPane().add(register);
 		
 		headImage = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().createImage("resourses/images/3.jpg")));
 		// headImage.setBackground(Color.blue);//设置边框颜色
 		// headImage.setBorder(BorderFactory.createLineBorder(Color.red));//组件边框颜色
 		headImage.setSize(500, 400);
 		headImage.setLocation(0, 0);
-		this.add(headImage);
+		getContentPane().add(headImage);
 	}
 	
 	
