@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import java.awt.Font;
@@ -52,12 +53,12 @@ public class LoginFrame extends JFrame {
 		loginname_1.setLocation(57, 200);
 		getContentPane().add(loginname_1);
 		
-		username = new JComboBox(new Object[]{"111","222","333"});
+		username = new JComboBox(new Object[]{"11","222","333"});
 		username.setSize(230, 30);
 		username.setLocation(130, 150);
 		getContentPane().add(username);
 
-		passwordInput = new JPasswordField("111");
+		passwordInput = new JPasswordField();
 		passwordInput.setSize(230, 30);
 		passwordInput.setLocation(130, 200);
 		getContentPane().add(passwordInput);
@@ -69,8 +70,28 @@ public class LoginFrame extends JFrame {
 		login.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//1.先做表单验证
-				//2.建立和服务器的连接（socket连接）
-				//3.在socket的基础上获取输入输出流，然后用输出流将消息发送给服务器，让服务器校验我们的账号和密码是否成功	
+				//trim是去除字符串前后空白
+				String yourInputUsername=username.getSelectedItem().toString().trim();
+				String yourInputPassword=passwordInput.getText().toString();//密码不用去前后
+				if(yourInputUsername.length()<3){
+					JOptionPane.showMessageDialog(LoginFrame.this, "账号长度不够!", "温馨提示", JOptionPane.ERROR_MESSAGE);
+					return;//不执行接下来的代码
+				}else{
+					if(yourInputPassword.length()<3){
+						JOptionPane.showMessageDialog(LoginFrame.this, "密码长度不够!", "温馨提示", JOptionPane.ERROR_MESSAGE);
+						passwordInput.requestFocus();//焦点获得
+						return;
+					}else{
+						//2.建立和服务器的连接（socket连接）
+						
+						//3.在socket的基础上获取输入输出流，然后用输出流将消息发送给服务器，让服务器校验我们的账号和密码是否成功	
+						
+						
+					}
+					
+				}
+			
+				
 			}
 		});
 		login.setSize(110, 40);

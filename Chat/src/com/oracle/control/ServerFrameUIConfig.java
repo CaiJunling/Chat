@@ -2,7 +2,7 @@ package com.oracle.control;
 
 public interface ServerFrameUIConfig {
 
-	public int serverFrameWidth=1000;
+	public int serverFrameWidth=675;
 	public int serverFrameHeight=600;
 	public String serverFrameTitle="服务器";
 //	public String logoPath="resources/images/logo.jpg";

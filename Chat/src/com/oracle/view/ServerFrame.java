@@ -6,12 +6,16 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -22,6 +26,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import com.oracle.control.ServerFrameUIConfig;
+import com.oracle.model.MessageBox;
 
 
 public class ServerFrame extends JFrame{
@@ -38,11 +43,7 @@ public class ServerFrame extends JFrame{
 	private Panel panel_1;
 	private Panel panel;
 	private JButton button;
-	private JButton button_3;
-	private JButton button_2;
 	private JButton button_1;
-	private JButton btnNewButton;
-	private JButton button_4;
 	
     {
 		
@@ -78,17 +79,17 @@ public class ServerFrame extends JFrame{
 		
 		lblNewLabel_1 = new JLabel("所有用户发送的消息列表");
 		lblNewLabel_1.setBorder(BorderFactory.createLineBorder(Color.gray));
-		lblNewLabel_1.setBounds(298, 21, 675, 15);
+		lblNewLabel_1.setBounds(298, 21, 350, 15);
 		contentPane.add(lblNewLabel_1);
 		
 		textArea = new JTextArea();
 		textArea.setEditable(false);
 		scrollPane_1 = new JScrollPane(textArea);
-		scrollPane_1.setBounds(298, 48, 675, 296);
+		scrollPane_1.setBounds(298, 48, 350, 296);
 		contentPane.add(scrollPane_1);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(18, 392, 955, 170);
+		tabbedPane.setBounds(18, 392, 630, 170);
 		contentPane.add(tabbedPane);
 		
 		panel_1 = new Panel();
@@ -97,37 +98,13 @@ public class ServerFrame extends JFrame{
 		
 		button = new JButton("启动服务器");
 		button.addActionListener(listener);
-		button.setBounds(72, 21, 93, 23);
+		button.setBounds(72, 45, 139, 39);
 		panel_1.add(button);
 		
 		button_1 = new JButton("停止服务器");
 		button_1.addActionListener(listener);
-		button_1.setBounds(196, 21, 93, 23);
+		button_1.setBounds(283, 45, 139, 39);
 		panel_1.add(button_1);
-		
-		button_2 = new JButton("断开所有用户");
-		button_2.addActionListener(listener);
-		button_2.setBounds(325, 21, 116, 23);
-		panel_1.add(button_2);
-		
-		button_3 = new JButton("修改服务端端口");
-		button_3.addActionListener(listener);
-		button_3.setBounds(481, 21, 145, 23);
-		panel_1.add(button_3);
-		
-		btnNewButton = new JButton("移除指定用户");
-		btnNewButton.addActionListener(listener);
-		btnNewButton.setBounds(636, 21, 116, 23);
-		panel_1.add(btnNewButton);
-		
-		button_4 = new JButton("中断所有消息传输");
-		button_4.setBounds(783, 21, 157, 23);
-		button_4.addActionListener(listener);
-		panel_1.add(button_4);
-		
-		panel = new Panel();
-		tabbedPane.addTab("高级控制", null, panel, null);
-		
 		
 		setLocationRelativeTo(null);
 	}
@@ -138,9 +115,29 @@ public class ServerFrame extends JFrame{
 			if(e.getSource()==button){
 				try {
 					server=new ServerSocket(ServerFrameUIConfig.serverPort);
-					
+					button.setEnabled(false);//设置启动键启动一次后就不能用了
+					//小窗口提示服务器启动成功
+					JOptionPane.showMessageDialog(ServerFrame.this, "服务器启动成功！", "温馨提示",JOptionPane.INFORMATION_MESSAGE);
+					//服务器连接用多线程
+					new Thread(){
+						public void run(){
+							while(true){
+								try {
+									Socket c=server.accept();
+									System.out.println(c.getInetAddress());//显示连进来的客户端IP
+									ObjectOutputStream out=new ObjectOutputStream(c.getOutputStream());
+									ObjectInputStream in=new ObjectInputStream(c.getInputStream());
+									
+									//有一个客户端连接进来，开启一个线程，针对他单独和服务器通讯
+									
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								
+							}
+						}
+					}.start();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -150,6 +147,41 @@ public class ServerFrame extends JFrame{
 		
 	}
 
+class ClientMessageReceiveThread extends Thread{
+	private ObjectOutputStream out;
+	private ObjectInputStream in;
 	
-
+	public ClientMessageReceiveThread(ObjectOutputStream out, ObjectInputStream in) {
+		super();
+		this.out = out;
+		this.in = in;
+	}
+	
+	public void run(){
+		while(true){
+			try {
+				MessageBox m=(MessageBox)in.readObject();
+				
+				if(m.getType().equals("login")){
+					processLoginMessage(m);
+				}
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * 这是处理登录消息的方法
+	 * @param m
+	 */
+	public void processLoginMessage(MessageBox m){
+		
+	}
+	
 }
+	
+}
+
