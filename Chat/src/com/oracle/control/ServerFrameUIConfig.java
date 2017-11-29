@@ -6,7 +6,8 @@ public interface ServerFrameUIConfig {
 	public int serverFrameHeight=600;
 	public String serverFrameTitle="服务器";
 //	public String logoPath="resources/images/logo.jpg";
-	public String serverIP="192.168.43.157";
-	public int serverPort=8888;
+	//public String serverIP="27.29.145.65";//宽带IP
+	public String serverIP="192.168.43.157";//手机WIFI   IP
+	public int serverPort=7777;
 
 }

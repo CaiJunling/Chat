@@ -25,8 +25,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import com.oracle.control.DBOperator;
 import com.oracle.control.ServerFrameUIConfig;
 import com.oracle.model.MessageBox;
+import com.oracle.model.User;
 
 
 public class ServerFrame extends JFrame{
@@ -37,6 +39,7 @@ public class ServerFrame extends JFrame{
 	private JLabel lblNewLabel;
 	private JTable table;
 	private TableModel  model;
+	private Object[] tableTitle=new Object[]{"登陆IP","用户昵称"};
 	private JScrollPane scrollPane_1;
 	private JTextArea textArea;
 	private JLabel lblNewLabel_1;
@@ -71,7 +74,7 @@ public class ServerFrame extends JFrame{
 		lblNewLabel.setBounds(18, 21, 241, 15);
 		contentPane.add(lblNewLabel);
 		
-		model=new DefaultTableModel(new Object[]{"登陆IP","用户昵称"},0) ;
+		model=new DefaultTableModel(tableTitle,0) ;
 		table = new JTable(model);
 		scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(18, 48, 241, 296);
@@ -161,7 +164,7 @@ class ClientMessageReceiveThread extends Thread{
 		while(true){
 			try {
 				MessageBox m=(MessageBox)in.readObject();
-				
+				System.out.println(m);
 				if(m.getType().equals("login")){
 					processLoginMessage(m);
 				}
@@ -178,6 +181,24 @@ class ClientMessageReceiveThread extends Thread{
 	 * @param m
 	 */
 	public void processLoginMessage(MessageBox m){
+		User loginedUser=DBOperator.login(m.getFrom().getUsername(), m.getFrom().getPassword());
+		//如果登陆成功，需要更新服务器窗口上显式的用户列表信息
+		if(loginedUser!=null){
+			model=new DefaultTableModel(new Object[][] {{loginedUser.getUsername(),loginedUser.getNickname()}}, tableTitle);
+			table.setModel(model);
+		}
+		//当服务器根据传过来的用户名和密码查询完数据库之后，无论登陆成功还失败都要给用户回一个消息(都要封装成MessageBox)
+		MessageBox loginedResult=new MessageBox();
+		loginedResult.setFrom(loginedUser);
+		loginedResult.setType("loginedResult");
+		
+		try {
+			out.writeObject(loginedResult);
+			out.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	

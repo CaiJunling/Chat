@@ -28,6 +28,14 @@ public class User implements Serializable{
 		this.friends = friends;
 	}
 
+	
+
+	public User(String username, String password) {
+		super();
+		this.username = username;
+		this.password = password;
+	}
+
 
 	public User(String username, String password, String sex, int age, String nickname, String signature,
 			String imagePath) {

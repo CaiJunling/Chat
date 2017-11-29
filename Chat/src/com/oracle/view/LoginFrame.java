@@ -5,6 +5,11 @@ import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -15,9 +20,17 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import com.oracle.control.ServerFrameUIConfig;
+import com.oracle.model.MessageBox;
+import com.oracle.model.User;
+
 import java.awt.Font;
 
 public class LoginFrame extends JFrame {
+	private Socket client;
+	private ObjectOutputStream out;
+	private ObjectInputStream in;
 	private JLabel headImage,loginname,registername;
 	private JLabel loginname_1;
 	private JButton login, register;
@@ -53,7 +66,7 @@ public class LoginFrame extends JFrame {
 		loginname_1.setLocation(57, 200);
 		getContentPane().add(loginname_1);
 		
-		username = new JComboBox(new Object[]{"11","222","333"});
+		username = new JComboBox(new Object[]{"111","222","333"});
 		username.setSize(230, 30);
 		username.setLocation(130, 150);
 		getContentPane().add(username);
@@ -82,16 +95,50 @@ public class LoginFrame extends JFrame {
 						passwordInput.requestFocus();//焦点获得
 						return;
 					}else{
+						
+						
 						//2.建立和服务器的连接（socket连接）
+						if(client!=null){
+							try {
+								client=new Socket(ServerFrameUIConfig.serverIP, ServerFrameUIConfig.serverPort);
+								//消息要封装成对象，所以，要传递消息要用Object流
+								out=new ObjectOutputStream(client.getOutputStream());
+								in=new ObjectInputStream(client.getInputStream());
+							} catch (Exception e1) {
+								e1.printStackTrace();
+								JOptionPane.showConfirmDialog(LoginFrame.this, "无法连接服务器，请检查网络!", "温馨提示", JOptionPane.ERROR_MESSAGE);
+							}
+						}
 						
 						//3.在socket的基础上获取输入输出流，然后用输出流将消息发送给服务器，让服务器校验我们的账号和密码是否成功	
+						//因为我们将消息封装成特定的类型，所以，每次再给服务器发送消息时，都要封装成特定的消息对象才可以
 						
+						try {
+							MessageBox loginMessage=new MessageBox();
+						    User willLoginUser=new User(yourInputUsername,yourInputPassword);
+						    loginMessage.setFrom(willLoginUser);
+						    loginMessage.setType("login");
+						    
+							out.writeObject(loginMessage); 
+							out.flush();
+							
+							//当客户端把登陆消息发送出去后，应该立马读取服务器回发的登陆结果消息
+							MessageBox result=(MessageBox)in.readObject();
+							if(result.getFrom()==null){
+								JOptionPane.showConfirmDialog(LoginFrame.this, "登陆失败,请检查用户名和密码!", "温馨提示", JOptionPane.ERROR_MESSAGE);
+							}else{
+								User u=result.getFrom();//服务器发来登录资料
+								System.out.println(u);
+								MainFrame m=new MainFrame();
+								m.setVisible(true);
+								LoginFrame.this.setVisible(false);
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
 						
 					}
-					
 				}
-			
-				
 			}
 		});
 		login.setSize(110, 40);
