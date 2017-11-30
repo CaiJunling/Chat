@@ -88,6 +88,7 @@ public class LoginFrame extends JFrame {
 				String yourInputPassword=passwordInput.getText().toString();//密码不用去前后
 				if(yourInputUsername.length()<3){
 					JOptionPane.showMessageDialog(LoginFrame.this, "账号长度不够!", "温馨提示", JOptionPane.ERROR_MESSAGE);
+					username.requestFocus();
 					return;//不执行接下来的代码
 				}else{
 					if(yourInputPassword.length()<3){
@@ -98,7 +99,7 @@ public class LoginFrame extends JFrame {
 						
 						
 						//2.建立和服务器的连接（socket连接）
-						if(client!=null){
+						if(client==null){
 							try {
 								client=new Socket(ServerFrameUIConfig.serverIP, ServerFrameUIConfig.serverPort);
 								//消息要封装成对象，所以，要传递消息要用Object流
@@ -146,6 +147,25 @@ public class LoginFrame extends JFrame {
 		getContentPane().add(login);
 
 		register = new JButton("注册");
+		register.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+					try {
+						if(client==null){
+						     client=new Socket(ServerFrameUIConfig.serverIP, ServerFrameUIConfig.serverPort);
+						     out=new ObjectOutputStream(client.getOutputStream());
+						     in=new ObjectInputStream(client.getInputStream());
+						}
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						JOptionPane.showConfirmDialog(LoginFrame.this, "无法连接服务器，请检查网络!", "温馨提示", JOptionPane.ERROR_MESSAGE);
+						} 
+					RegisterFrame r=new RegisterFrame();
+					r.setVisible(true);
+					return;
+				
+			}
+		});
 		register.setFont(new Font("宋体", Font.BOLD, 15));
 		register.setSize(110, 40);
 		register.setLocation(250, 260);

@@ -19,7 +19,7 @@ public class DBOperator {
 	 * @return
 	 */
 	public boolean register(User user){
-		File data=new File("databases"+user.getUsername()+".qq");
+		File data=new File("databases/"+user.getUsername()+".qq");
 		if(data.exists()){
 			return false;
 		}
@@ -31,7 +31,7 @@ public class DBOperator {
 	 */
 	public boolean updateprofile(User user){
 		try {
-			ObjectOutputStream out=new ObjectOutputStream(new FileOutputStream("databases"+user.getUsername()+".qq"));
+			ObjectOutputStream out=new ObjectOutputStream(new FileOutputStream("databases/"+user.getUsername()+".qq"));
 			out.writeObject(user);
 			out.flush();
 			out.close();
@@ -51,10 +51,13 @@ public class DBOperator {
 	 * @param args
 	 */
 	public static User login(String username,String password){
-		File data=new File("databases"+username+".qq");
+		File data=new File("databases/"+username+".qq");
+		System.out.println("用户名"+username);
+		System.out.println(data.toString());
 		if(data.exists()){
+			System.out.println("用户访问数据库登录");
 			try {
-				ObjectInputStream in=new ObjectInputStream(new FileInputStream("databases"+username+".qq"));
+				ObjectInputStream in=new ObjectInputStream(new FileInputStream("databases/"+username+".qq"));
 				try {
 					User dbuser=(User)in.readObject();
 					if(password.equals(dbuser.getPassword())){
@@ -74,6 +77,7 @@ public class DBOperator {
 				return null;
 			}
 		}else{
+			System.out.println("用户信息不全");
 			return null;
 		}
 		
@@ -83,11 +87,11 @@ public class DBOperator {
 	 * @param args
 	 */
 	public User searchFriendsByCondition(String username){
-		File data=new File("databases"+username+".qq");
+		File data=new File("databases/"+username+".qq");
 		if(!data.exists()){
 			try {
 				//查找外部数据库
-				ObjectInputStream in=new ObjectInputStream(new FileInputStream("databases"+username+".qq"));
+				ObjectInputStream in=new ObjectInputStream(new FileInputStream("databases/"+username+".qq"));
 				try {
 					User dbdata=(User)in.readObject();
 					return dbdata;
@@ -105,7 +109,7 @@ public class DBOperator {
 		}else{
 			try {
 				//查找内部数据库
-				ObjectInputStream in=new ObjectInputStream(new FileInputStream("databases"+username+".qq"));
+				ObjectInputStream in=new ObjectInputStream(new FileInputStream("databases/"+username+".qq"));
 				try {
 					User dbdata=(User)in.readObject();
 					return dbdata;
@@ -127,7 +131,7 @@ public class DBOperator {
 	 * @param args
 	 */
 	public boolean addFriend(User user){
-		File data=new File("databases"+user.getUsername()+".qq");
+		File data=new File("databases/"+user.getUsername()+".qq");
 		if(!data.exists()){
 			return updateprofile(user);
 		}else{

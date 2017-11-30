@@ -132,7 +132,8 @@ public class ServerFrame extends JFrame{
 									ObjectInputStream in=new ObjectInputStream(c.getInputStream());
 									
 									//有一个客户端连接进来，开启一个线程，针对他单独和服务器通讯
-									
+									ClientMessageReceiveThread thisClientThread=new ClientMessageReceiveThread(out, in);
+									thisClientThread.start();
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -164,7 +165,7 @@ class ClientMessageReceiveThread extends Thread{
 		while(true){
 			try {
 				MessageBox m=(MessageBox)in.readObject();
-				System.out.println(m);
+				System.out.println("用户传入的账号密码"+m);
 				if(m.getType().equals("login")){
 					processLoginMessage(m);
 				}
@@ -182,6 +183,7 @@ class ClientMessageReceiveThread extends Thread{
 	 */
 	public void processLoginMessage(MessageBox m){
 		User loginedUser=DBOperator.login(m.getFrom().getUsername(), m.getFrom().getPassword());
+		System.out.println("从数据库读取的用户信息"+loginedUser);
 		//如果登陆成功，需要更新服务器窗口上显式的用户列表信息
 		if(loginedUser!=null){
 			model=new DefaultTableModel(new Object[][] {{loginedUser.getUsername(),loginedUser.getNickname()}}, tableTitle);
@@ -191,7 +193,7 @@ class ClientMessageReceiveThread extends Thread{
 		MessageBox loginedResult=new MessageBox();
 		loginedResult.setFrom(loginedUser);
 		loginedResult.setType("loginedResult");
-		
+		System.out.println(loginedResult);
 		try {
 			out.writeObject(loginedResult);
 			out.flush();
