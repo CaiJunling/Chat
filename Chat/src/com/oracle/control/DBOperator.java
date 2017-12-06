@@ -18,7 +18,7 @@ public class DBOperator {
 	 * 这是注册方法，注册成功返回true,失败返回false
 	 * @return
 	 */
-	public boolean register(User user){
+	public static boolean register(User user){
 		File data=new File("databases/"+user.getUsername()+".qq");
 		if(data.exists()){
 			return false;
@@ -29,7 +29,7 @@ public class DBOperator {
 	 * 这是修改信息的方法，修改成功返回true，失败返回false
 	 * @param args
 	 */
-	public boolean updateprofile(User user){
+	public static boolean updateprofile(User user){
 		try {
 			ObjectOutputStream out=new ObjectOutputStream(new FileOutputStream("databases/"+user.getUsername()+".qq"));
 			out.writeObject(user);
@@ -86,26 +86,10 @@ public class DBOperator {
 	 * 这是通过条件查找朋友的方法，查找成功返回朋友信息，失败返回null(找不到文件)
 	 * @param args
 	 */
-	public User searchFriendsByCondition(String username){
+	public static User searchFriendsByCondition(String username){
 		File data=new File("databases/"+username+".qq");
 		if(!data.exists()){
-			try {
-				//查找外部数据库
-				ObjectInputStream in=new ObjectInputStream(new FileInputStream("databases/"+username+".qq"));
-				try {
-					User dbdata=(User)in.readObject();
-					return dbdata;
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-					return null;
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
+			return null;
 		}else{
 			try {
 				//查找内部数据库
@@ -130,7 +114,7 @@ public class DBOperator {
 	 * 这是添加朋友方法，添加成功返回true，失败返回false（说明该用户已经存在）
 	 * @param args
 	 */
-	public boolean addFriend(User user){
+	public static boolean addFriend(User user){
 		File data=new File("databases/"+user.getUsername()+".qq");
 		if(!data.exists()){
 			return updateprofile(user);
@@ -140,25 +124,55 @@ public class DBOperator {
 	}
 
 	public static void main(String[] args) {
-		User user1=new User("111", "111", "男", 10, "小白", "好饿", "resourses/images/头像1.png");
-		User user2=new User("222", "222", "女", 20, "小红", "好饿哦", "resourses/images/头像2.png");
-		User user3=new User("333", "333", "男", 30, "小黄", "好饱", "resourses/images/头像3.png");
-		User user4=new User("444", "444", "女", 40, "小绿", "好饿啊", "resourses/images/头像4.png");
-		User user5=new User("555", "555", "男", 50, "小蓝", "想吃饭", "resourses/images/头像5.png");
-		User user6=new User("666", "666", "女", 60, "小紫", "不想吃饭", "resourses/images/头像6.png");
-		User user7=new User("777", "666", "女", 60, "小紫", "不想吃饭", "resourses/images/头像6.png");
+		User user1=new User("111", "111", "女", 21, "蔡宝", "好饿好饿好饿啊~", "resourses/images/蔡宝1.jpg");
+		User user2=new User("222", "222", "女", 20, "小红", "好饿哦", "resourses/images/头像3.jpg");
+		User user3=new User("333", "333", "男", 30, "小黄", "好饱", "resourses/images/头像4.jpg");
+		User user4=new User("444", "444", "女", 40, "小绿", "好饿啊", "resourses/images/头像5.jpg");
+		User user5=new User("555", "555", "男", 50, "小蓝", "想吃饭", "resourses/images/头像6.jpg");
+		User user6=new User("666", "666", "女", 60, "小紫", "不想吃饭", "resourses/images/头像7.jpg");
+		User user7=new User("777", "777", "女", 20, "姣宝", "我最可爱~", "resourses/images/姣宝1.jpg");
+		
+		Map<String,HashSet<User>> friends1=new HashMap<>();
+		  HashSet<User> f11s=new HashSet<>();
+		       f11s.add(user2);
+		       f11s.add(user5);
+		       f11s.add(user4);
+		       
+		       friends1.put("同学", f11s);
+		       user7.setFriends(friends1);
+		  HashSet<User> f22s=new HashSet<>();
+		       f22s.add(user3);
+		       f22s.add(user6);
+		       
+		       friends1.put("家人", f22s);
+		       user7.setFriends(friends1);
+		  HashSet<User> f33s=new HashSet<>();
+		       f33s.add(user1);
+		       
+		       friends1.put("基友", f33s);
+		       user7.setFriends(friends1);
 		
 		Map<String,HashSet<User>> friends=new HashMap<>();
-		HashSet<User> f1s=new HashSet<>();
+		  HashSet<User> f1s=new HashSet<>();
 		       f1s.add(user2);
 		       f1s.add(user3);
 		       f1s.add(user4);
-		       f1s.add(user5);
-		       f1s.add(user6);
-		       f1s.add(user7);
 		       
 		       friends.put("大学同学", f1s);
 		       user1.setFriends(friends);
+		  HashSet<User> f2s=new HashSet<>();
+		       f2s.add(user5);
+		       f2s.add(user6);
+		       
+		       friends.put("逗比室友", f2s);
+		       user1.setFriends(friends);
+		  HashSet<User> f3s=new HashSet<>();
+		       f3s.add(user7);
+		       
+		       friends.put("闺蜜", f3s);
+		       user1.setFriends(friends);
+		
+		       
 		
 		try {
 			ObjectOutputStream out=new ObjectOutputStream(new FileOutputStream("databases/"+user1.getUsername()+".qq"));

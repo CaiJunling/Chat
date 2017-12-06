@@ -24,6 +24,12 @@ public class User implements Serializable{
 	}
 
 
+	public User(String username) {
+		super();
+		this.username = username;
+	}
+
+
 	public void setFriends(Map<String, HashSet<User>> friends) {
 		this.friends = friends;
 	}

@@ -10,6 +10,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -32,6 +35,9 @@ import com.oracle.model.User;
 
 
 public class ServerFrame extends JFrame{
+	//封装，根据实际情况，我们为了编程的便利性，我们将UI和后台控制Socket的代码整合到这个一个类中，
+	private Map<String,ObjectOutputStream> allClient=new HashMap<>();
+	
 	private ServerSocket  server;
 	private AllButtonListener  listener;//内部类监听对象
 	private JPanel contentPane;
@@ -116,6 +122,7 @@ public class ServerFrame extends JFrame{
 	class AllButtonListener implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource()==button){
+			//	System.out.println("hahaha");
 				try {
 					server=new ServerSocket(ServerFrameUIConfig.serverPort);
 					button.setEnabled(false);//设置启动键启动一次后就不能用了
@@ -136,11 +143,20 @@ public class ServerFrame extends JFrame{
 									thisClientThread.start();
 								} catch (IOException e) {
 									e.printStackTrace();
+									JOptionPane.showMessageDialog(ServerFrame.this, "服务器启动失败！", "温馨提示", JOptionPane.ERROR_MESSAGE);
 								}
 								
 							}
 						}
 					}.start();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(ServerFrame.this, "服务器启动失败！", "温馨提示", JOptionPane.ERROR_MESSAGE);
+				
+				}
+			}else if(e.getSource()==button_1){
+				try {
+					server.close();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -168,6 +184,14 @@ class ClientMessageReceiveThread extends Thread{
 				System.out.println("用户传入的账号密码"+m);
 				if(m.getType().equals("login")){
 					processLoginMessage(m);
+				}else if(m.getType().equals("register")){
+					processRegisterMessage(m);
+				}else if(m.getType().equals("openChat")){
+					processOpenChatUser(m);
+				}else if(m.getType().equals("textMessage")){
+					processTextMessage(m);
+				}else if(m.getType().equals("updateMessage")){
+					processUpdateMessage(m);
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -176,7 +200,28 @@ class ClientMessageReceiveThread extends Thread{
 			}
 		}
 	}
-	
+	/**
+	 * 这是处理传过来的普通消息的方法
+	 */
+	public void processTextMessage(MessageBox m){
+		System.out.println("打开的聊天对象"+m);
+		for(String username:allClient.keySet()){
+			System.out.println(username);
+			if(username.equals(m.getTo().getUsername())){
+				m.setTime(new Date().toLocaleString());//输出时间
+				try {
+					System.out.println("服务器时间"+m);
+					allClient.get(username).writeObject(m);
+					allClient.get(username).flush();
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
+			}
+		}
+	}
+
 	/**
 	 * 这是处理登录消息的方法
 	 * @param m
@@ -186,6 +231,8 @@ class ClientMessageReceiveThread extends Thread{
 		System.out.println("从数据库读取的用户信息"+loginedUser);
 		//如果登陆成功，需要更新服务器窗口上显式的用户列表信息
 		if(loginedUser!=null){
+			allClient.put(loginedUser.getUsername(), out);
+			//如果登陆成功，需要更新服务器窗口上显式的用户列表信息
 			model=new DefaultTableModel(new Object[][] {{loginedUser.getUsername(),loginedUser.getNickname()}}, tableTitle);
 			table.setModel(model);
 		}
@@ -203,8 +250,74 @@ class ClientMessageReceiveThread extends Thread{
 		}
 		
 	}
+	/**
+	 * 这是处理注册信息的代码
+	 * @param m
+	 */
+	public void processRegisterMessage(MessageBox m){
+		User willRegisterUser=m.getFrom();
+		Boolean result=DBOperator.register(willRegisterUser);
+		
+		//服务器根据收到的注册信息给用户回信息
+		//先把消息进行封装
+		MessageBox registerResultMessage=new MessageBox();
+		registerResultMessage.setContent(result.toString());
+		registerResultMessage.setType("registerResult");
+		try {
+			out.writeObject(registerResultMessage);
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * 这是处理修改用户信息的代码
+	 * @param m
+	 */
+	public void processUpdateMessage(MessageBox m){
+		User willUpdateMessage=m.getFrom();
+		Boolean result=DBOperator.updateprofile(willUpdateMessage);
+		
+		//服务器根据收到的修改信息给用户回信息
+		//先把消息进行封装
+		MessageBox updateResultMessage=new MessageBox();
+		updateResultMessage.setContent(result.toString());
+		updateResultMessage.setType("updateResult");
+		try {
+            System.out.println("修改后的内容"+updateResultMessage);
+			out.writeObject(updateResultMessage);
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * 这是处理用户打开聊天界面加载聊天信息对象信息的代码
+	 */
+	public void processOpenChatUser(MessageBox m){
+		System.out.println("聊天界面"+m);
+		User willOpen = m.getFrom();
+	 	User result=DBOperator.searchFriendsByCondition(willOpen.getUsername());
+	 	System.out.println("聊天对方的信息"+result);
+	 	MessageBox openChatUserResult=new MessageBox();
+	 	openChatUserResult.setTo(result);
+	 	openChatUserResult.setType("openChatUserResult");
+	 	System.out.println("聊天对方的信息"+openChatUserResult);
+	 	try {
+			out.writeObject(openChatUserResult);
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	 
 	
-}
+	}
+
+
+	
+	
+	
+	}
 	
 }
 

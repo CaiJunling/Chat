@@ -22,6 +22,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.oracle.control.ServerFrameUIConfig;
+import com.oracle.control.TaskIcon;
 import com.oracle.model.MessageBox;
 import com.oracle.model.User;
 
@@ -67,6 +68,7 @@ public class LoginFrame extends JFrame {
 		getContentPane().add(loginname_1);
 		
 		username = new JComboBox(new Object[]{"111","222","333"});
+		username.setEditable(true);
 		username.setSize(230, 30);
 		username.setLocation(130, 150);
 		getContentPane().add(username);
@@ -118,7 +120,7 @@ public class LoginFrame extends JFrame {
 							MessageBox loginMessage=new MessageBox();
 						    User willLoginUser=new User(yourInputUsername,yourInputPassword);
 						    loginMessage.setFrom(willLoginUser);
-						    loginMessage.setType("login");
+					 	    loginMessage.setType("login");
 						    
 							out.writeObject(loginMessage); 
 							out.flush();
@@ -130,9 +132,12 @@ public class LoginFrame extends JFrame {
 							}else{
 								User u=result.getFrom();//服务器发来登录资料
 								System.out.println(u);
-								MainFrame m=new MainFrame();
+								
+								
+								MainFrame m=new MainFrame(u,in,out);
 								m.setVisible(true);
 								LoginFrame.this.setVisible(false);
+								
 							}
 						} catch (Exception e1) {
 							e1.printStackTrace();
@@ -159,10 +164,11 @@ public class LoginFrame extends JFrame {
 					} catch (Exception e1) {
 						e1.printStackTrace();
 						JOptionPane.showConfirmDialog(LoginFrame.this, "无法连接服务器，请检查网络!", "温馨提示", JOptionPane.ERROR_MESSAGE);
+						return;
 						} 
-					RegisterFrame r=new RegisterFrame();
+					RegisterFrame r=new RegisterFrame(out,in,LoginFrame.this);
 					r.setVisible(true);
-					return;
+					LoginFrame.this.setVisible(false);
 				
 			}
 		});
